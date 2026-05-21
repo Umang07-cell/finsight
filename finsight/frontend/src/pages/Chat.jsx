@@ -125,14 +125,14 @@ export default function Chat() {
       {/* Top bar */}
       <div
         style={{ backgroundColor: topBarBg, borderColor }}
-        className="flex items-center justify-between px-6 py-4 backdrop-blur-sm border-b z-10"
+        className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 backdrop-blur-sm border-b z-10 gap-2 overflow-hidden"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setDrawerOpen(!drawerOpen)}
-            className="w-9 h-9 flex flex-col gap-1.5 items-center justify-center rounded-xl transition-colors"
+            className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0 flex flex-col gap-1.5 items-center justify-center rounded-xl transition-colors"
             style={{ color: textColor }}
           >
             <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
@@ -143,7 +143,12 @@ export default function Chat() {
             <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
               <span className="text-white font-bold text-xs">F</span>
             </div>
-            <span style={{ color: textColor }} className="font-semibold">FinSight</span>
+            <span
+              style={{ color: textColor }}
+              className="font-semibold text-sm sm:text-base whitespace-nowrap"
+            >
+            FinSight
+</span>
           </div>
         </div>
 
@@ -169,7 +174,7 @@ export default function Chat() {
   ))}
 </div>
 
-        <div className="flex items-center gap-2">
+        <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
           {/* Dark mode toggle */}
           <motion.button
             whileHover={{ scale: 1.05 }}
