@@ -4,10 +4,19 @@ import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 
-function FormattedText({ content }) {
+function FormattedText({ content, darkMode }) {
   const lines = content.split('\n')
   const elements = []
   let i = 0
+
+  const textColor = darkMode ? 'text-slate-200' : 'text-gray-700'
+  const headingColor = darkMode ? 'text-slate-100' : 'text-gray-900'
+  const subHeadingColor = darkMode ? 'text-slate-200' : 'text-gray-700'
+  const borderColor = darkMode ? 'border-slate-600' : 'border-gray-100'
+  const tableBg = darkMode ? 'bg-slate-700' : 'bg-gray-50'
+  const tableAltBg = darkMode ? 'bg-slate-800' : 'bg-white'
+  const tableText = darkMode ? 'text-slate-200' : 'text-gray-600'
+  const tableHeadText = darkMode ? 'text-slate-100' : 'text-gray-700'
 
   while (i < lines.length) {
     const line = lines[i]
@@ -21,15 +30,15 @@ function FormattedText({ content }) {
         i++
       }
       elements.push(
-        <div key={`table-${i}`} className="overflow-x-auto my-3 rounded-xl border border-gray-200">
+        <div key={`table-${i}`} className={`overflow-x-auto my-3 rounded-xl border ${borderColor}`}>
           <table className="w-full text-xs">
-            <thead className="bg-gray-50">
-              <tr>{headers.map((h, j) => <th key={j} className="px-3 py-2 text-left font-semibold text-gray-700 border-b border-gray-200">{h}</th>)}</tr>
+            <thead className={tableBg}>
+              <tr>{headers.map((h, j) => <th key={j} className={`px-3 py-2 text-left font-semibold ${tableHeadText} border-b ${borderColor}`}>{h}</th>)}</tr>
             </thead>
             <tbody>
               {rows.map((row, j) => (
-                <tr key={j} className={j % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                  {row.map((cell, k) => <td key={k} className="px-3 py-2 text-gray-600 border-b border-gray-100">{cell}</td>)}
+                <tr key={j} className={j % 2 === 0 ? tableAltBg : tableBg}>
+                  {row.map((cell, k) => <td key={k} className={`px-3 py-2 ${tableText} border-b ${borderColor}`}>{cell}</td>)}
                 </tr>
               ))}
             </tbody>
@@ -44,29 +53,29 @@ function FormattedText({ content }) {
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
 
     if (line.startsWith('# ')) {
-      elements.push(<h3 key={i} className="font-bold text-base mt-3 mb-1 text-gray-900" dangerouslySetInnerHTML={{ __html: line.replace('# ', '') }} />)
+      elements.push(<h3 key={i} className={`font-bold text-base mt-3 mb-1 ${headingColor}`} dangerouslySetInnerHTML={{ __html: line.replace('# ', '') }} />)
     } else if (line.startsWith('## ')) {
-      elements.push(<h4 key={i} className="font-semibold text-sm mt-3 mb-1 text-gray-900 border-b border-gray-100 pb-1" dangerouslySetInnerHTML={{ __html: line.replace('## ', '') }} />)
+      elements.push(<h4 key={i} className={`font-semibold text-sm mt-3 mb-1 ${headingColor} border-b ${borderColor} pb-1`} dangerouslySetInnerHTML={{ __html: line.replace('## ', '') }} />)
     } else if (line.startsWith('### ')) {
-      elements.push(<h5 key={i} className="font-semibold text-sm mt-2 text-gray-700" dangerouslySetInnerHTML={{ __html: line.replace('### ', '') }} />)
+      elements.push(<h5 key={i} className={`font-semibold text-sm mt-2 ${subHeadingColor}`} dangerouslySetInnerHTML={{ __html: line.replace('### ', '') }} />)
     } else if (line.startsWith('- ') || line.startsWith('* ')) {
       elements.push(
         <div key={i} className="flex gap-2 ml-2">
           <span className="text-blue-400 mt-1 flex-shrink-0 text-xs">▸</span>
-          <span className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: formatted.replace(/^[-*] /, '') }} />
+          <span className={`text-sm ${textColor}`} dangerouslySetInnerHTML={{ __html: formatted.replace(/^[-*] /, '') }} />
         </div>
       )
     } else if (/^\d+\./.test(line)) {
       elements.push(
         <div key={i} className="flex gap-2 ml-2">
           <span className="text-blue-500 font-semibold text-xs min-w-[20px] flex-shrink-0 mt-0.5">{line.match(/^\d+/)[0]}.</span>
-          <span className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: formatted.replace(/^\d+\. /, '') }} />
+          <span className={`text-sm ${textColor}`} dangerouslySetInnerHTML={{ __html: formatted.replace(/^\d+\. /, '') }} />
         </div>
       )
     } else if (line.trim() === '') {
       elements.push(<div key={i} className="h-1" />)
     } else {
-      elements.push(<p key={i} className="text-sm leading-relaxed text-gray-700" dangerouslySetInnerHTML={{ __html: formatted }} />)
+      elements.push(<p key={i} className={`text-sm leading-relaxed ${textColor}`} dangerouslySetInnerHTML={{ __html: formatted }} />)
     }
     i++
   }
@@ -124,35 +133,35 @@ function ChartBlock({ chartData }) {
 function ReportCard({ report }) {
   const reportRef = useRef()
 
-const downloadPDF = async () => {
-  const element = reportRef.current
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    backgroundColor: '#ffffff',
-    useCORS: true,
-    logging: false
-  })
-  const imgData = canvas.toDataURL('image/png')
-  const pdf = new jsPDF('p', 'mm', 'a4')
-  const pdfWidth = pdf.internal.pageSize.getWidth()
-  const pdfHeight = pdf.internal.pageSize.getHeight()
-  const imgWidth = pdfWidth
-  const imgHeight = (canvas.height * pdfWidth) / canvas.width
-  let heightLeft = imgHeight
-  let position = 0
+  const downloadPDF = async () => {
+    const element = reportRef.current
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false
+    })
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pdfWidth = pdf.internal.pageSize.getWidth()
+    const pdfHeight = pdf.internal.pageSize.getHeight()
+    const imgWidth = pdfWidth
+    const imgHeight = (canvas.height * pdfWidth) / canvas.width
+    let heightLeft = imgHeight
+    let position = 0
 
-  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-  heightLeft -= pdfHeight
-
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight
-    pdf.addPage()
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
     heightLeft -= pdfHeight
-  }
 
-  pdf.save('FinSight-Report.pdf')
-}
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight
+      pdf.addPage()
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pdfHeight
+    }
+
+    pdf.save('FinSight-Report.pdf')
+  }
 
   return (
     <motion.div
@@ -160,7 +169,6 @@ const downloadPDF = async () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-3 mt-2 max-w-2xl"
     >
-      {/* Download button */}
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -173,10 +181,7 @@ const downloadPDF = async () => {
         Download Report as PDF
       </motion.button>
 
-      {/* Report content */}
       <div ref={reportRef} className="space-y-3 bg-white p-2 rounded-2xl">
-
-        {/* Summary */}
         <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-2xl p-5">
           <h4 className="text-blue-600 font-semibold text-sm mb-2 flex items-center gap-2">
             <span>📋</span> Executive Summary
@@ -184,10 +189,8 @@ const downloadPDF = async () => {
           <p className="text-gray-700 text-sm leading-relaxed">{report.summary}</p>
         </div>
 
-        {/* Chart */}
         {report.chart_data && <ChartBlock chartData={report.chart_data} />}
 
-        {/* Key Findings */}
         <div className="bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-2xl p-5">
           <h4 className="text-amber-600 font-semibold text-sm mb-3 flex items-center gap-2">
             <span>🔍</span> Key Findings
@@ -202,7 +205,6 @@ const downloadPDF = async () => {
           </ul>
         </div>
 
-        {/* Positives and Risks */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="bg-gradient-to-br from-green-50 to-white border border-green-100 rounded-2xl p-5">
             <h4 className="text-green-600 font-semibold text-sm mb-3 flex items-center gap-2">
@@ -232,7 +234,6 @@ const downloadPDF = async () => {
           </div>
         </div>
 
-        {/* Recommendation */}
         <div className="bg-gradient-to-br from-violet-50 to-white border border-violet-100 rounded-2xl p-5">
           <h4 className="text-violet-600 font-semibold text-sm mb-2 flex items-center gap-2">
             <span>💡</span> Recommendation
@@ -249,7 +250,6 @@ const downloadPDF = async () => {
             </span>
           )}
         </div>
-
       </div>
     </motion.div>
   )
@@ -269,7 +269,7 @@ export default function MessageBubble({ message, darkMode = false }) {
         {!isUser && (
           <div className="flex items-center gap-2 mb-1.5">
             <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center text-xs text-white font-bold">F</div>
-            <span className="text-gray-400 text-xs">{message.model}</span>
+            <span className={`text-xs ${darkMode ? 'text-slate-400' : 'text-gray-400'}`}>{message.model}</span>
             {message.mode && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                 message.mode === 'fast' ? 'bg-emerald-100 text-emerald-700' :
@@ -286,18 +286,20 @@ export default function MessageBubble({ message, darkMode = false }) {
           <ReportCard report={message.report} />
         ) : (
           <div className={`rounded-2xl px-4 py-3 ${
-           isUser
-             ? 'bg-gray-900 text-white rounded-tr-sm text-sm'
-             : `${darkMode ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-white border-gray-200 text-gray-800'} border rounded-tl-sm shadow-sm`
-    }`}>
-            {isUser ? message.content : <FormattedText content={message.content} />}
+            isUser
+              ? 'bg-gray-900 text-white rounded-tr-sm text-sm'
+              : darkMode
+                ? 'bg-slate-800 border border-slate-600 text-slate-100 rounded-tl-sm shadow-sm'
+                : 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm shadow-sm'
+          }`}>
+            {isUser ? message.content : <FormattedText content={message.content} darkMode={darkMode} />}
           </div>
         )}
 
         {message.sources?.length > 0 && (
           <div className="mt-2 space-y-1">
             {message.sources.slice(0, 3).map((s, i) => (
-              <div key={i} className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-500">
+              <div key={i} className={`${darkMode ? 'bg-slate-800 border-slate-600 text-slate-400' : 'bg-gray-50 border-gray-200 text-gray-500'} border rounded-lg px-3 py-1.5 text-xs`}>
                 📄 {s.company} {s.year} — Page {s.page}
               </div>
             ))}
