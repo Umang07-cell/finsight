@@ -18,9 +18,19 @@ async def query_filing(request: QueryRequest, db: Session = Depends(get_db)):
         chunks = retrieve_chunks(request.question, request.mode)
     except Exception:
         chunks = []
+        # Fetch conversation history
+    history_records = db.query(ChatHistory)\
+        .filter(ChatHistory.session_id == request.session_id)\
+        .order_by(ChatHistory.created_at.asc())\
+        .limit(20)\
+        .all()
 
+    history = []
+    for record in history_records:
+        history.append({"role": "user", "content": record.question})
+        history.append({"role": "assistant", "content": record.answer})
     try:
-        result = query_llm(request.question, chunks, request.mode)
+        result = query_llm(request.question, chunks, request.mode, history)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM error: {str(e)}")
 
