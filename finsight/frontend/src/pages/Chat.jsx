@@ -150,7 +150,7 @@ export default function Chat() {
         {/* Mode switcher */}
         <div
   style={{ backgroundColor: darkMode ? '#1e293b' : '#f1f5f9', borderColor }}
-  className="px-1.5 sm:px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 shadow-sm whitespace-nowrap flex items-center justify-center"
+  className="flex items-center rounded-xl p-1 gap-0.5 max-w-full overflow-hidden shrink"
 >
   {Object.entries(themes).map(([key, th]) => (
     <motion.button
@@ -161,7 +161,7 @@ export default function Chat() {
         backgroundColor: mode === key ? cardBg : 'transparent',
         color: mode === key ? textColor : subTextColor,
       }}
-      className="px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 shadow-sm whitespace-nowrap"
+      className="px-1.5 sm:px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 shadow-sm whitespace-nowrap flex items-center justify-center"
     >
       {key === 'fast' ? '⚡' : key === 'standard' ? '🧠' : '🔬'} 
       <span className="hidden sm:inline ml-1">{key === 'fast' ? 'Fast' : key === 'standard' ? 'Standard' : 'Deep'}</span>
