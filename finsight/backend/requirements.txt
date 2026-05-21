@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+langchain
+langchain-openai
+langchain-community
+chromadb
+pinecone-client
+openai
+pypdf
+python-dotenv
+sqlalchemy
+psycopg2-binary
+python-multipart
+pydantic
