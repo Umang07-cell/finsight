@@ -68,34 +68,48 @@ export default function Chat() {
     }
   }
 
-  const handleFileUpload = async (file) => {
-    if (!file || !company || !year) {
-      setDrawerOpen(true)
-      return
-    }
-    setUploading(true)
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('company_name', company)
-    formData.append('year', year)
-    try {
-      const res = await axios.post(
-  'https://finsight-production-b9e2.up.railway.app/api/ingest',
-  formData,
-  {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+const handleFileUpload = async (file) => {
+  if (!file) return
+  setUploading(true)
+  
+  const isPDF = file.type === 'application/pdf'
+  const endpoint = isPDF ? '/analyze-pdf' : '/analyze-image'
+  
+  const formData = new FormData()
+  formData.append('file', file)
+
+  // Show user message
+  sendMessage(`[Uploaded: ${file.name}] Please analyze this ${isPDF ? 'document' : 'image'}.`, mode)
+
+  try {
+    const res = await axios.post(
+      `https://finsight-production-b9e2.up.railway.app/api/ingest${endpoint}`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    )
+    
+    // Add analysis as bot message directly
+    setMessages(prev => [...prev, {
+      role: 'assistant',
+      content: res.data.analysis,
+      sources: [],
+      mode: mode,
+      model: mode === 'fast' ? 'llama-3.1-8b-instant' : 'llama-3.3-70b-versatile',
+      report: null
+    }])
+  } catch (e) {
+    setMessages(prev => [...prev, {
+      role: 'assistant',
+      content: 'Failed to analyze the file. Please try again.',
+      sources: [],
+      mode,
+      model: '',
+      report: null
+    }])
+  } finally {
+    setUploading(false)
   }
-)
-      setUploadedFiles(prev => [...prev, { company, year, chunks: res.data.chunks_created }])
-      sendMessage(`I've uploaded ${company}'s ${year} 10-K filing. Give me a brief overview.`, mode)
-    } catch {
-      alert('Upload failed')
-    } finally {
-      setUploading(false)
-    }
-  }
+}
 
   const handleCompanyInsight = () => {
     if (!company || !year) return
@@ -378,7 +392,7 @@ export default function Chat() {
                 >
                   {uploading ? 'Processing...' : '+ Drop or click to upload PDF'}
                 </motion.button>
-                <input ref={fileRef} type="file" accept=".pdf" className="hidden"
+                <input ref={fileRef} type="file" accept=".pdf,image/*" className="hidden"
                   onChange={e => handleFileUpload(e.target.files[0])} />
                 {uploadedFiles.map((f, i) => (
                   <div key={i} style={{ backgroundColor: darkMode ? '#0f172a' : '#f9fafb' }} className="mt-2 rounded-xl px-3 py-2">
@@ -501,7 +515,8 @@ export default function Chat() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </motion.button>
-            <input ref={imageRef} type="file" accept="image/*" className="hidden" />
+            <input ref={imageRef} type="file" accept="image/*" className="hidden"
+               onChange={e => handleFileUpload(e.target.files[0])} />
 
             <textarea
               ref={inputRef}
