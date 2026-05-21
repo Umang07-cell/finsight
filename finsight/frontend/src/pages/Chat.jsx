@@ -123,80 +123,183 @@ export default function Chat() {
       />
 
       {/* Top bar */}
-      <div
-        style={{ backgroundColor: topBarBg, borderColor }}
-        className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 backdrop-blur-sm border-b z-10 gap-2 overflow-hidden"
+<div
+  style={{ backgroundColor: topBarBg, borderColor }}
+  className="backdrop-blur-sm border-b z-10 px-3 sm:px-6 py-3 sm:py-4"
+>
+
+  {/* Desktop Navbar */}
+  <div className="hidden sm:flex items-center justify-between gap-4">
+
+    {/* Left */}
+    <div className="flex items-center gap-3 flex-shrink-0">
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setDrawerOpen(!drawerOpen)}
+        className="w-9 h-9 flex flex-col gap-1.5 items-center justify-center rounded-xl transition-colors"
+        style={{ color: textColor }}
       >
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setDrawerOpen(!drawerOpen)}
-            className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0 flex flex-col gap-1.5 items-center justify-center rounded-xl transition-colors"
-            style={{ color: textColor }}
-          >
-            <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
-            <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
-            <span style={{ backgroundColor: textColor }} className="w-3 h-0.5 rounded block"></span>
-          </motion.button>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
-              <span className="text-white font-bold text-xs">F</span>
-            </div>
-            <span
-              style={{ color: textColor }}
-              className="font-semibold text-sm sm:text-base whitespace-nowrap"
-            >
-            FinSight
-</span>
-          </div>
+        <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
+        <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
+        <span style={{ backgroundColor: textColor }} className="w-3 h-0.5 rounded block"></span>
+      </motion.button>
+
+      <div className="flex items-center gap-2">
+        <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
+          <span className="text-white font-bold text-xs">F</span>
         </div>
 
-        {/* Mode switcher */}
-        <div
-  style={{ backgroundColor: darkMode ? '#1e293b' : '#f1f5f9', borderColor }}
-  className="flex items-center rounded-xl p-1 gap-0.5 max-w-full overflow-hidden shrink"
->
-  {Object.entries(themes).map(([key, th]) => (
-    <motion.button
-      key={key}
-      onClick={() => setMode(key)}
-      whileTap={{ scale: 0.95 }}
+        <span
+          style={{ color: textColor }}
+          className="font-semibold text-base whitespace-nowrap"
+        >
+          FinSight
+        </span>
+      </div>
+    </div>
+
+    {/* Mode switcher */}
+    <div
       style={{
-        backgroundColor: mode === key ? cardBg : 'transparent',
-        color: mode === key ? textColor : subTextColor,
+        backgroundColor: darkMode ? '#1e293b' : '#f1f5f9',
+        borderColor
       }}
-      className="px-1.5 sm:px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 shadow-sm whitespace-nowrap flex items-center justify-center"
+      className="flex items-center rounded-xl p-1 gap-1"
     >
-      {key === 'fast' ? '⚡' : key === 'standard' ? '🧠' : '🔬'} 
-      <span className="hidden sm:inline ml-1">{key === 'fast' ? 'Fast' : key === 'standard' ? 'Standard' : 'Deep'}</span>
-    </motion.button>
-  ))}
-</div>
+      {Object.entries(themes).map(([key]) => (
+        <motion.button
+          key={key}
+          onClick={() => setMode(key)}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            backgroundColor: mode === key ? cardBg : 'transparent',
+            color: mode === key ? textColor : subTextColor,
+          }}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 shadow-sm whitespace-nowrap flex items-center justify-center"
+        >
+          {key === 'fast'
+            ? '⚡ Fast'
+            : key === 'standard'
+            ? '🧠 Standard'
+            : '🔬 Deep'}
+        </motion.button>
+      ))}
+    </div>
 
-        <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
-          {/* Dark mode toggle */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setDarkMode(!darkMode)}
-            style={{ borderColor, color: subTextColor }}
-            className="text-xs border px-3 py-1.5 rounded-lg transition-colors"
-          >
-            {darkMode ? '☀️ Light' : '🌙 Dark'}
-          </motion.button>
+    {/* Right */}
+    <div className="flex items-center gap-2 flex-shrink-0">
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={clearMessages}
-            style={{ borderColor, color: subTextColor }}
-            className="text-xs border px-3 py-1.5 rounded-lg transition-colors"
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setDarkMode(!darkMode)}
+        style={{ borderColor, color: subTextColor }}
+        className="text-xs border px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+      >
+        {darkMode ? '☀️ Light' : '🌙 Dark'}
+      </motion.button>
+
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={clearMessages}
+        style={{ borderColor, color: subTextColor }}
+        className="text-xs border px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+      >
+        Clear chat
+      </motion.button>
+    </div>
+  </div>
+
+  {/* Mobile Navbar */}
+  <div className="flex sm:hidden flex-col gap-3">
+
+    {/* Row 1 */}
+    <div className="flex items-center justify-between">
+
+      {/* Left */}
+      <div className="flex items-center gap-2">
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setDrawerOpen(!drawerOpen)}
+          className="w-8 h-8 flex flex-col gap-1.5 items-center justify-center rounded-xl"
+          style={{ color: textColor }}
+        >
+          <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
+          <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
+          <span style={{ backgroundColor: textColor }} className="w-3 h-0.5 rounded block"></span>
+        </motion.button>
+
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
+            <span className="text-white font-bold text-xs">F</span>
+          </div>
+
+          <span
+            style={{ color: textColor }}
+            className="font-semibold text-lg whitespace-nowrap"
           >
-            Clear chat
-          </motion.button>
+            FinSight
+          </span>
         </div>
       </div>
+
+      {/* Right */}
+      <div className="flex items-center gap-1">
+
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setDarkMode(!darkMode)}
+          style={{ borderColor, color: subTextColor }}
+          className="text-[10px] border px-2 py-1 rounded-lg whitespace-nowrap"
+        >
+          {darkMode ? '☀️' : '🌙'}
+        </motion.button>
+
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={clearMessages}
+          style={{ borderColor, color: subTextColor }}
+          className="text-[10px] border px-2 py-1 rounded-lg whitespace-nowrap"
+        >
+          Clear
+        </motion.button>
+      </div>
+    </div>
+
+    {/* Row 2 - Centered Mode Switcher */}
+    <div className="flex justify-center w-full">
+
+      <div
+        style={{
+          backgroundColor: darkMode ? '#1e293b' : '#f1f5f9',
+          borderColor
+        }}
+        className="flex items-center rounded-xl p-1 gap-1"
+      >
+        {Object.entries(themes).map(([key]) => (
+          <motion.button
+            key={key}
+            onClick={() => setMode(key)}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              backgroundColor: mode === key ? cardBg : 'transparent',
+              color: mode === key ? textColor : subTextColor,
+            }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap flex items-center justify-center"
+          >
+            {key === 'fast'
+              ? '⚡'
+              : key === 'standard'
+              ? '🧠'
+              : '🔬'}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Drawer */}
       <AnimatePresence>
