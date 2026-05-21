@@ -150,7 +150,7 @@ export default function Chat() {
         {/* Mode switcher */}
         <div
   style={{ backgroundColor: darkMode ? '#1e293b' : '#f1f5f9', borderColor }}
-  className="flex items-center rounded-xl p-1 gap-0.5"
+  className="px-1.5 sm:px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 shadow-sm whitespace-nowrap flex items-center justify-center"
 >
   {Object.entries(themes).map(([key, th]) => (
     <motion.button
