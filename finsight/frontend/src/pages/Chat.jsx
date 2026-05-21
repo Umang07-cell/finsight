@@ -79,7 +79,7 @@ export default function Chat() {
     formData.append('company_name', company)
     formData.append('year', year)
     try {
-      const res = await axios.post('/api/ingest/', formData)
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/ingest/`, formData)
       setUploadedFiles(prev => [...prev, { company, year, chunks: res.data.chunks_created }])
       sendMessage(`I've uploaded ${company}'s ${year} 10-K filing. Give me a brief overview.`, mode)
     } catch {
