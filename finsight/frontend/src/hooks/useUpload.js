@@ -16,7 +16,7 @@ export default function useUpload() {
     formData.append('year', year)
 
     try {
-      const res = await axios.post('/api/ingest/', formData, {
+      const res = await axios.post('https://finsight-production-b9e2.up.railway.app/api/ingest/', formData,
         headers: { 'Content-Type': 'multipart/form-data' }
       })
       setUploadedFiles(prev => [...prev, {

@@ -12,7 +12,7 @@ export default function useChat() {
     setLoading(true)
 
     try {
-      const res = await axios.post('/api/query/', {
+      const res = await axios.post('https://finsight-production-b9e2.up.railway.app/api/query/', {
         question,
         session_id: sessionId,
         mode
