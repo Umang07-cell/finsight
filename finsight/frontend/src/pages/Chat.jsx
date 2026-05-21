@@ -149,24 +149,25 @@ export default function Chat() {
 
         {/* Mode switcher */}
         <div
-          style={{ backgroundColor: darkMode ? '#1e293b' : '#f1f5f9', borderColor }}
-          className="flex items-center rounded-xl p-1 gap-1"
-        >
-          {Object.entries(themes).map(([key, th]) => (
-            <motion.button
-              key={key}
-              onClick={() => setMode(key)}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                backgroundColor: mode === key ? cardBg : 'transparent',
-                color: mode === key ? textColor : subTextColor,
-              }}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 shadow-sm"
-            >
-              {th.label}
-            </motion.button>
-          ))}
-        </div>
+  style={{ backgroundColor: darkMode ? '#1e293b' : '#f1f5f9', borderColor }}
+  className="flex items-center rounded-xl p-1 gap-0.5"
+>
+  {Object.entries(themes).map(([key, th]) => (
+    <motion.button
+      key={key}
+      onClick={() => setMode(key)}
+      whileTap={{ scale: 0.95 }}
+      style={{
+        backgroundColor: mode === key ? cardBg : 'transparent',
+        color: mode === key ? textColor : subTextColor,
+      }}
+      className="px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 shadow-sm whitespace-nowrap"
+    >
+      {key === 'fast' ? '⚡' : key === 'standard' ? '🧠' : '🔬'} 
+      <span className="hidden sm:inline ml-1">{key === 'fast' ? 'Fast' : key === 'standard' ? 'Standard' : 'Deep'}</span>
+    </motion.button>
+  ))}
+</div>
 
         <div className="flex items-center gap-2">
           {/* Dark mode toggle */}
