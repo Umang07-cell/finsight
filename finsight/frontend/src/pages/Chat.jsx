@@ -44,7 +44,7 @@ export default function Chat() {
   const [previewOpen, setPreviewOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState([])
-  const { messages, loading, sendMessage, clearMessages, setMessages } = useChat()
+  const { messages, setMessages, loading, sendMessage, clearMessages, startNewChat, loadChat, savedChats, sessionId } = useChat()
   const inputRef = useRef()
   const fileRef = useRef()
   const imageRef = useRef()
@@ -224,19 +224,16 @@ export default function Chat() {
       >
        <Sidebar
   onClear={clearMessages}
-  recentChats={messages.filter(m => m.role === 'user').map((m, i) => ({ id: i, title: m.content.slice(0, 40) }))}
+  recentChats={savedChats.map(c => ({ id: c.id, title: c.title }))}
   activeChat={null}
-  setActiveChat={() => {}}
-  onNewChat={() => { clearMessages(); setDrawerOpen(false) }}
+  setActiveChat={(id) => { loadChat(id); setDrawerOpen(false) }}
+  onNewChat={() => { startNewChat(); setDrawerOpen(false) }}
   darkMode={darkMode}
   company={company}
   setCompany={setCompany}
   year={year}
   setYear={setYear}
   onCompanyInsight={handleCompanyInsight}
-  onUploadPDF={() => fileRef.current.click()}
-  uploading={uploading}
-  uploadedFiles={uploadedFiles}
 />
       </motion.div>
     </>
