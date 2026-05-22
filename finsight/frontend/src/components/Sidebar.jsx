@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Trash2, MessageSquare } from 'lucide-react'
+import { Trash2, MessageSquare, Settings, User } from 'lucide-react'
 
 export default function Sidebar({
   onClear,
@@ -13,9 +13,6 @@ export default function Sidebar({
   year,
   setYear,
   onCompanyInsight,
-  onUploadPDF,
-  uploading,
-  uploadedFiles = [],
 }) {
   const bg = darkMode ? '#1e293b' : '#ffffff'
   const textColor = darkMode ? '#f1f5f9' : '#111827'
@@ -24,35 +21,31 @@ export default function Sidebar({
   const inputBg = darkMode ? '#0f172a' : '#f9fafb'
 
   return (
-    <div
-      style={{ backgroundColor: bg, borderRightColor: border, height: '100%', display: 'flex', flexDirection: 'column' }}
-      className="border-r w-72 overflow-hidden"
-    >
+    <div style={{ backgroundColor: bg, borderRightColor: border }} className="border-r w-72 h-full flex flex-col overflow-hidden">
+
       {/* Header */}
-      <div style={{ borderBottomColor: border }} className="flex items-center justify-between p-4 border-b flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
-            <span className="text-white font-bold text-xs">F</span>
-          </div>
-          <span style={{ color: textColor }} className="font-semibold">FinSight</span>
+      <div style={{ borderBottomColor: border }} className="flex items-center gap-2 p-4 border-b flex-shrink-0">
+        <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
+          <span className="text-white font-bold text-xs">F</span>
         </div>
+        <span style={{ color: textColor }} className="font-semibold">FinSight</span>
       </div>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto">
+      {/* New Chat button */}
+      <div style={{ borderBottomColor: border }} className="p-3 border-b flex-shrink-0">
+        <motion.button
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onNewChat}
+          className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-medium"
+        >
+          <span>✏️</span>
+          <span>New Chat</span>
+        </motion.button>
+      </div>
 
-        {/* New Chat */}
-        <div style={{ borderBottomColor: border }} className="p-3 border-b">
-          <motion.button
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onNewChat}
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-medium"
-          >
-            <span>✏️</span>
-            <span>New Chat</span>
-          </motion.button>
-        </div>
+      {/* Scrollable middle */}
+      <div className="flex-1 overflow-y-auto">
 
         {/* Company Insight */}
         <div style={{ borderBottomColor: border }} className="p-4 border-b">
@@ -83,26 +76,6 @@ export default function Sidebar({
           </button>
         </div>
 
-        {/* Upload PDF */}
-        <div style={{ borderBottomColor: border }} className="p-4 border-b">
-          <h3 style={{ color: textColor }} className="font-semibold text-sm mb-1">📄 Upload 10-K Filing</h3>
-          <p style={{ color: subText }} className="text-xs mb-3">Enter company details above first</p>
-          <button
-            onClick={onUploadPDF}
-            disabled={uploading || !company || !year}
-            style={{ borderColor: border, color: subText }}
-            className="w-full border-2 border-dashed rounded-xl py-3 text-sm disabled:opacity-40"
-          >
-            {uploading ? 'Processing...' : '+ Click to upload PDF'}
-          </button>
-          {uploadedFiles.map((f, i) => (
-            <div key={i} style={{ backgroundColor: inputBg }} className="mt-2 rounded-xl px-3 py-2">
-              <p style={{ color: textColor }} className="text-xs font-medium">{f.company} {f.year}</p>
-              <p style={{ color: subText }} className="text-xs">{f.chunks} chunks indexed</p>
-            </div>
-          ))}
-        </div>
-
         {/* Recent Chats */}
         <div className="p-4">
           <h3 style={{ color: textColor }} className="font-semibold text-sm mb-3">Recent Chats</h3>
@@ -120,30 +93,35 @@ export default function Sidebar({
                   <span className="truncate text-xs">{chat.title}</span>
                 </div>
                 <button
-                  onClick={e => { e.stopPropagation(); }}
+                  onClick={e => { e.stopPropagation() }}
                   className="opacity-0 group-hover:opacity-100 transition-all"
                 >
                   <Trash2 size={13} style={{ color: subText }} />
                 </button>
               </motion.button>
             )) : (
-              <p style={{ color: subText }} className="text-xs px-3 py-2">No recent chats</p>
+              <p style={{ color: subText }} className="text-xs px-3 py-2">No recent chats yet</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Bottom - Clear chat */}
-      <div style={{ borderTopColor: border }} className="border-t p-3 flex-shrink-0">
-        <motion.button
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onClear}
-          style={{ borderColor: border, color: subText }}
-          className="w-full border py-2 rounded-xl text-sm transition-all"
+      {/* Bottom - Settings & Profile */}
+      <div style={{ borderTopColor: border }} className="border-t p-3 space-y-1 flex-shrink-0">
+        <button
+          style={{ color: subText }}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm hover:opacity-80 transition-all"
         >
-          Clear Chat
-        </motion.button>
+          <Settings size={16} />
+          <span>Settings</span>
+        </button>
+        <button
+          style={{ color: subText }}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm hover:opacity-80 transition-all"
+        >
+          <User size={16} />
+          <span>Profile</span>
+        </button>
       </div>
     </div>
   )
