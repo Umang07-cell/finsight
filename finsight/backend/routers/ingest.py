@@ -85,7 +85,7 @@ async def analyze_image(file: UploadFile = File(...)):
         media_type = f"image/{ext}" if ext != 'jpg' else "image/jpeg"
 
         response = client.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            model="llama-4-scout-17b-16e-instruct",
             messages=[
                 {
                     "role": "user",
