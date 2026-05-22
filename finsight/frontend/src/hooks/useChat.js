@@ -43,5 +43,5 @@ export default function useChat() {
 
   const clearMessages = () => setMessages([])
 
-  return { messages, loading, sendMessage, clearMessages, sessionId }
+  return { messages, loading, sendMessage, clearMessages, sessionId, setMessages }
 }
