@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import MessageBubble from '../components/MessageBubble'
 import useChat from '../hooks/useChat'
 import axios from 'axios'
+import Sidebar from '../components/Sidebar'
 
 const API = 'https://finsight-production-b9e2.up.railway.app'
 
@@ -200,62 +201,47 @@ export default function Chat() {
 
       {/* ===== DRAWER ===== */}
       <AnimatePresence>
-        {drawerOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawerOpen(false)} className="fixed inset-0 bg-black/30 z-20 backdrop-blur-sm" />
-            <motion.aside initial={{ x: -320 }} animate={{ x: 0 }} exit={{ x: -320 }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              style={{ backgroundColor: cardBg, borderRightColor: borderColor }} className="fixed left-0 top-0 h-full w-72 shadow-2xl z-30 flex flex-col border-r">
-              <div style={{ borderBottomColor: borderColor }} className="flex items-center justify-between p-4 border-b">
-                <span style={{ color: textColor }} className="font-semibold text-sm">Menu</span>
-                <button onClick={() => setDrawerOpen(false)} style={{ color: subTextColor }} className="text-xl">×</button>
-              </div>
+  {drawerOpen && (
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={() => setDrawerOpen(false)}
+        className="fixed inset-0 bg-black/30 z-20 backdrop-blur-sm"
+      />
 
-              <div style={{ borderBottomColor: borderColor }} className="p-4 border-b">
-                <h3 style={{ color: textColor }} className="font-semibold text-sm mb-1">🏢 Company Insight</h3>
-                <p style={{ color: subTextColor }} className="text-xs mb-3">Full analysis without uploading PDF</p>
-                <input type="text" placeholder="Company (e.g. Apple)" value={company} onChange={e => setCompany(e.target.value)}
-                  style={{ backgroundColor: darkMode ? '#0f172a' : '#f9fafb', borderColor, color: textColor }}
-                  className="w-full border rounded-xl px-3 py-2 text-sm mb-2 focus:outline-none" />
-                <input type="text" placeholder="Year (e.g. 2023)" value={year} onChange={e => setYear(e.target.value)}
-                  style={{ backgroundColor: darkMode ? '#0f172a' : '#f9fafb', borderColor, color: textColor }}
-                  className="w-full border rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none" />
-                <button onClick={handleCompanyInsight} disabled={!company || !year}
-                  className="w-full bg-gray-900 text-white py-2 rounded-xl text-sm font-medium disabled:opacity-40">
-                  Analyze Company →
-                </button>
-              </div>
-
-              <div style={{ borderBottomColor: borderColor }} className="p-4 border-b">
-                <h3 style={{ color: textColor }} className="font-semibold text-sm mb-1">📄 Upload 10-K Filing</h3>
-                <p style={{ color: subTextColor }} className="text-xs mb-3">Enter company details above first</p>
-                <button onClick={() => fileRef.current.click()} disabled={uploading || !company || !year}
-                  style={{ borderColor, color: subTextColor }}
-                  className="w-full border-2 border-dashed rounded-xl py-3 text-sm disabled:opacity-40">
-                  {uploading ? 'Processing...' : '+ Click to upload PDF'}
-                </button>
-                {uploadedFiles.map((f, i) => (
-                  <div key={i} style={{ backgroundColor: darkMode ? '#0f172a' : '#f9fafb' }} className="mt-2 rounded-xl px-3 py-2">
-                    <p style={{ color: textColor }} className="text-xs font-medium">{f.company} {f.year}</p>
-                    <p style={{ color: subTextColor }} className="text-xs">{f.chunks} chunks indexed</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-4 flex-1 overflow-y-auto">
-                <h3 style={{ color: textColor }} className="font-semibold text-sm mb-3">Recent Chats</h3>
-                {messages.filter(m => m.role === 'user').slice(-5).reverse().map((m, i) => (
-                  <div key={i} style={{ borderBottomColor: borderColor }} className="py-2 border-b">
-                    <p style={{ color: subTextColor }} className="text-xs truncate">{m.content}</p>
-                  </div>
-                ))}
-                {messages.filter(m => m.role === 'user').length === 0 && (
-                  <p style={{ color: subTextColor }} className="text-xs">No recent chats</p>
-                )}
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+      <motion.div
+        initial={{ x: -320 }}
+        animate={{ x: 0 }}
+        exit={{ x: -320 }}
+        transition={{
+          type: 'spring',
+          damping: 25,
+          stiffness: 200
+        }}
+        className="fixed left-0 top-0 h-full z-30"
+      >
+        <Sidebar
+          mode={mode}
+          setMode={setMode}
+          onClear={clearMessages}
+          recentChats={
+            messages
+              .filter(m => m.role === 'user')
+              .map((m, i) => ({
+                id: i,
+                title: m.content.slice(0, 40)
+              }))
+          }
+          activeChat={null}
+          setActiveChat={() => {}}
+          onNewChat={clearMessages}
+        />
+      </motion.div>
+    </>
+  )}
+</AnimatePresence>
 
       {/* ===== CHAT AREA ===== */}
       <div className="flex-1 overflow-y-auto z-10">
