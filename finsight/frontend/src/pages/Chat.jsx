@@ -38,6 +38,9 @@ export default function Chat() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [company, setCompany] = useState('')
   const [year, setYear] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState('')
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState([])
   const { messages, loading, sendMessage, clearMessages, setMessages } = useChat()
@@ -107,12 +110,14 @@ export default function Chat() {
 
   return (
     <motion.div
-      animate={{ backgroundColor: t.bg }}
-      transition={{ duration: 0.6 }}
-      style={{ backgroundColor: t.bg }}
-      className="h-screen flex flex-col relative overflow-hidden"
-      style={{ fontFamily: "'DM Sans', sans-serif", backgroundColor: t.bg }}
-    >
+  animate={{ backgroundColor: t.bg }}
+  transition={{ duration: 0.6 }}
+  className="h-screen flex flex-col relative overflow-hidden"
+  style={{
+    fontFamily: "'DM Sans', sans-serif",
+    backgroundColor: t.bg
+  }}
+>
       {/* Orbs */}
       <motion.div key={mode + darkMode} initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 0.5, scale: 1 }} transition={{ duration: 0.8 }} style={{ backgroundColor: t.orb }} className="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl pointer-events-none z-0" />
       <motion.div key={mode + 'b' + darkMode} initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ duration: 1 }} style={{ backgroundColor: t.orb }} className="absolute bottom-20 left-0 w-64 h-64 rounded-full blur-3xl pointer-events-none z-0" />
@@ -297,6 +302,55 @@ export default function Chat() {
           </div>
         )}
       </div>
+      {previewOpen && selectedFile && (
+  <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div className="bg-white rounded-2xl p-4 w-full max-w-lg">
+      
+      <h2 className="text-lg font-semibold mb-3">
+        Preview File
+      </h2>
+
+      {selectedFile.type.startsWith('image/') ? (
+        <img
+          src={previewUrl}
+          alt="preview"
+          className="w-full rounded-xl max-h-[400px] object-contain"
+        />
+      ) : (
+        <iframe
+          src={URL.createObjectURL(selectedFile)}
+          title="PDF Preview"
+          className="w-full h-[400px] rounded-xl"
+        />
+      )}
+
+      <div className="flex justify-end gap-2 mt-4">
+        
+        <button
+          onClick={() => {
+            setPreviewOpen(false)
+            setSelectedFile(null)
+          }}
+          className="px-4 py-2 rounded-xl border"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            handleFileUpload(selectedFile)
+            setPreviewOpen(false)
+            setSelectedFile(null)
+          }}
+          className="px-4 py-2 rounded-xl bg-black text-white"
+        >
+          Send
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
 
       {/* ===== INPUT BAR ===== */}
       <div style={{ backgroundColor: topBarBg, borderTopColor: borderColor }} className="border-t z-10 p-3 sm:p-4 flex-shrink-0">
@@ -313,7 +367,21 @@ export default function Chat() {
               </svg>
             </motion.button>
             <input ref={fileRef} type="file" accept=".pdf" className="hidden"
-              onChange={e => { if (e.target.files[0]) handleFileUpload(e.target.files[0]); e.target.value = '' }} />
+              onChange={e => {
+   const file = e.target.files[0]
+   if (!file) return
+
+   setSelectedFile(file)
+   setPreviewOpen(true)
+
+   if (file.type.startsWith('image/')) {
+      setPreviewUrl(URL.createObjectURL(file))
+   } else {
+      setPreviewUrl('')
+   }
+
+   e.target.value = ''
+}}
 
             {/* Image button */}
             <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
@@ -325,7 +393,21 @@ export default function Chat() {
               </svg>
             </motion.button>
             <input ref={imageRef} type="file" accept="image/*" className="hidden"
-              onChange={e => { if (e.target.files[0]) handleFileUpload(e.target.files[0]); e.target.value = '' }} />
+              onChange={e => {
+   const file = e.target.files[0]
+   if (!file) return
+
+   setSelectedFile(file)
+   setPreviewOpen(true)
+
+   if (file.type.startsWith('image/')) {
+      setPreviewUrl(URL.createObjectURL(file))
+   } else {
+      setPreviewUrl('')
+   }
+
+   e.target.value = ''
+}}
 
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKey}
               placeholder="Ask anything about finance, markets, investments..."
