@@ -222,22 +222,22 @@ export default function Chat() {
         }}
         className="fixed left-0 top-0 h-full w-72 z-30"
       >
-        <Sidebar
-          mode={mode}
-          setMode={setMode}
-          onClear={clearMessages}
-          recentChats={
-            messages
-              .filter(m => m.role === 'user')
-              .map((m, i) => ({
-                id: i,
-                title: m.content.slice(0, 40)
-              }))
-          }
-          activeChat={null}
-          setActiveChat={() => {}}
-          onNewChat={clearMessages}
-        />
+       <Sidebar
+  onClear={clearMessages}
+  recentChats={messages.filter(m => m.role === 'user').map((m, i) => ({ id: i, title: m.content.slice(0, 40) }))}
+  activeChat={null}
+  setActiveChat={() => {}}
+  onNewChat={() => { clearMessages(); setDrawerOpen(false) }}
+  darkMode={darkMode}
+  company={company}
+  setCompany={setCompany}
+  year={year}
+  setYear={setYear}
+  onCompanyInsight={handleCompanyInsight}
+  onUploadPDF={() => fileRef.current.click()}
+  uploading={uploading}
+  uploadedFiles={uploadedFiles}
+/>
       </motion.div>
     </>
   )}
