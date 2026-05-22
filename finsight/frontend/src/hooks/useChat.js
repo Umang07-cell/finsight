@@ -4,6 +4,7 @@ import axios from 'axios'
 export default function useChat() {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
+  const [savedChats, setSavedChats] = useState([])
   const sessionId = useState(() => crypto.randomUUID())[0]
 
   const sendMessage = async (question, mode = 'standard') => {
@@ -41,7 +42,26 @@ export default function useChat() {
     }
   }
 
+  const startNewChat = () => {
+    if (messages.length > 0) {
+      const firstUserMsg = messages.find(m => m.role === 'user')
+      if (firstUserMsg) {
+        setSavedChats(prev => [{
+          id: Date.now(),
+          title: firstUserMsg.content.slice(0, 50),
+          messages: [...messages]
+        }, ...prev.slice(0, 9)])
+      }
+    }
+    setMessages([])
+  }
+
+  const loadChat = (chatId) => {
+    const chat = savedChats.find(c => c.id === chatId)
+    if (chat) setMessages(chat.messages)
+  }
+
   const clearMessages = () => setMessages([])
 
-  return { messages, loading, sendMessage, clearMessages, sessionId, setMessages }
+  return { messages, setMessages, loading, sendMessage, clearMessages, startNewChat, loadChat, savedChats, sessionId }
 }
