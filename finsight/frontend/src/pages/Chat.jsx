@@ -220,7 +220,7 @@ export default function Chat() {
           damping: 25,
           stiffness: 200
         }}
-        className="fixed left-0 top-0 h-full z-30"
+        className="fixed left-0 top-0 h-full w-72 z-30"
       >
         <Sidebar
           mode={mode}
@@ -303,85 +303,35 @@ export default function Chat() {
           className="w-full rounded-xl max-h-[400px] object-contain"
         />
       ) : (
-        <iframe
-          src={URL.createObjectURL(selectedFile)}
-          title="PDF Preview"
-          className="w-full h-[400px] rounded-xl"
-        />
+        <embed
+  src={previewUrl}
+  type="application/pdf"
+  className="w-full h-[400px] rounded-xl"
+/>
       )}
 
       <div className="flex justify-end gap-2 mt-4">
         
         <button
           onClick={() => {
-            setPreviewOpen(false)
-            setSelectedFile(null)
-          }}
+  setPreviewOpen(false)
+  setSelectedFile(null)
+  setPreviewUrl('')
+}}
           className="px-4 py-2 rounded-xl border"
         >
           Cancel
         </button>
 
         <button
-          onClick={() => {
-            handleFileUpload(selectedFile)
-            setPreviewOpen(false)
-            setSelectedFile(null)
-          }}
+         onClick={() => {
+  handleFileUpload(selectedFile)
+
+  setPreviewOpen(false)
+  setSelectedFile(null)
+  setPreviewUrl('')
+}}
           className="px-4 py-2 rounded-xl bg-black text-white"
-        >
-          Send
-        </button>
-
-      </div>
-    </div>
-  </div>
-)}
-{previewOpen && selectedFile && (
-  <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-
-    <div className="bg-white rounded-2xl p-4 w-full max-w-2xl shadow-2xl">
-
-      <h2 className="text-xl font-semibold mb-4 text-black">
-        Preview File
-      </h2>
-
-      {selectedFile.type.startsWith('image/') ? (
-        <img
-          src={previewUrl}
-          alt="preview"
-          className="w-full max-h-[500px] object-contain rounded-xl"
-        />
-      ) : (
-        <iframe
-          src={previewUrl}
-          title="PDF Preview"
-          className="w-full h-[500px] rounded-xl border"
-        />
-      )}
-
-      <div className="flex justify-end gap-3 mt-4">
-
-        <button
-          onClick={() => {
-            setPreviewOpen(false)
-            setSelectedFile(null)
-            setPreviewUrl('')
-          }}
-          className="px-4 py-2 border rounded-xl text-black"
-        >
-          Cancel
-        </button>
-
-        <button
-          onClick={() => {
-            handleFileUpload(selectedFile)
-
-            setPreviewOpen(false)
-            setSelectedFile(null)
-            setPreviewUrl('')
-          }}
-          className="px-4 py-2 bg-black text-white rounded-xl"
         >
           Send
         </button>
