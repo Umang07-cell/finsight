@@ -8,57 +8,114 @@ const API = 'https://finsight-production-b9e2.up.railway.app'
 
 const themes = {
   fast: {
-    light: { bg: '#f0fdf4', orb: '#bbf7d0', button: '#10b981', badge: '#d1fae5', badgeText: '#065f46' },
-    dark: { bg: '#0a1a0f', orb: '#14532d', button: '#10b981', badge: '#14532d', badgeText: '#6ee7b7' },
-    label: '⚡ Fast', desc: 'Llama 3 8B — instant answers'
+    light: {
+      bg: '#f0fdf4',
+      orb: '#bbf7d0',
+      button: '#10b981',
+      badge: '#d1fae5',
+      badgeText: '#065f46'
+    },
+    dark: {
+      bg: '#0a1a0f',
+      orb: '#14532d',
+      button: '#10b981',
+      badge: '#14532d',
+      badgeText: '#6ee7b7'
+    },
+    label: '⚡ Fast',
+    desc: 'Llama 3 8B — instant answers'
   },
+
   standard: {
-    light: { bg: '#f8fafc', orb: '#bfdbfe', button: '#3b82f6', badge: '#dbeafe', badgeText: '#1e40af' },
-    dark: { bg: '#0f172a', orb: '#1e3a5f', button: '#3b82f6', badge: '#1e3a5f', badgeText: '#93c5fd' },
-    label: '🧠 Standard', desc: 'Llama 3 70B — detailed analysis'
+    light: {
+      bg: '#f8fafc',
+      orb: '#bfdbfe',
+      button: '#3b82f6',
+      badge: '#dbeafe',
+      badgeText: '#1e40af'
+    },
+    dark: {
+      bg: '#0f172a',
+      orb: '#1e3a5f',
+      button: '#3b82f6',
+      badge: '#1e3a5f',
+      badgeText: '#93c5fd'
+    },
+    label: '🧠 Standard',
+    desc: 'Llama 3 70B — detailed analysis'
   },
+
   deep: {
-    light: { bg: '#faf5ff', orb: '#ddd6fe', button: '#7c3aed', badge: '#ede9fe', badgeText: '#5b21b6' },
-    dark: { bg: '#0d0a1a', orb: '#2e1065', button: '#7c3aed', badge: '#2e1065', badgeText: '#c4b5fd' },
-    label: '🔬 Deep', desc: 'Full report with citations'
+    light: {
+      bg: '#faf5ff',
+      orb: '#ddd6fe',
+      button: '#7c3aed',
+      badge: '#ede9fe',
+      badgeText: '#5b21b6'
+    },
+    dark: {
+      bg: '#0d0a1a',
+      orb: '#2e1065',
+      button: '#7c3aed',
+      badge: '#2e1065',
+      badgeText: '#c4b5fd'
+    },
+    label: '🔬 Deep',
+    desc: 'Full report with citations'
   }
 }
-
-const quickPrompts = [
-  "What are today's top market movers?",
-  "How should a beginner start investing?",
-  "Explain good debt vs bad debt",
-  "How can I save more money?",
-]
 
 export default function Chat() {
   const [mode, setMode] = useState('standard')
   const [darkMode, setDarkMode] = useState(false)
   const [input, setInput] = useState('')
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [company, setCompany] = useState('')
-  const [year, setYear] = useState('')
+
   const [selectedFile, setSelectedFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState('')
   const [previewOpen, setPreviewOpen] = useState(false)
+
   const [uploading, setUploading] = useState(false)
-  const [uploadedFiles, setUploadedFiles] = useState([])
-  const { messages, loading, sendMessage, clearMessages, setMessages } = useChat()
+
+  const {
+    messages,
+    loading,
+    sendMessage,
+    clearMessages,
+    setMessages
+  } = useChat()
+
   const inputRef = useRef()
   const fileRef = useRef()
   const imageRef = useRef()
 
   const t = themes[mode][darkMode ? 'dark' : 'light']
+
   const textColor = darkMode ? '#f1f5f9' : '#111827'
   const subTextColor = darkMode ? '#94a3b8' : '#6b7280'
   const cardBg = darkMode ? '#1e293b' : '#ffffff'
   const borderColor = darkMode ? '#334155' : '#e5e7eb'
   const inputBg = darkMode ? '#1e293b' : '#ffffff'
-  const topBarBg = darkMode ? 'rgba(15,23,42,0.95)' : 'rgba(255,255,255,0.95)'
+  const topBarBg = darkMode
+    ? 'rgba(15,23,42,0.95)'
+    : 'rgba(255,255,255,0.95)'
+
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
 
   const handleSend = (text) => {
     const q = text || input.trim()
+
     if (!q || loading) return
+
     sendMessage(q, mode)
     setInput('')
   }
@@ -72,358 +129,352 @@ export default function Chat() {
 
   const handleFileUpload = async (file) => {
     if (!file) return
+
+    const allowed =
+      file.type === 'application/pdf' ||
+      file.type.startsWith('image/')
+
+    if (!allowed) {
+      alert('Only PDF and images are allowed')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size should be under 10MB')
+      return
+    }
+
     setUploading(true)
+
     const isPDF = file.type === 'application/pdf'
-    const endpoint = isPDF ? '/analyze-pdf' : '/analyze-image'
+
+    const endpoint = isPDF
+      ? '/analyze-pdf'
+      : '/analyze-image'
+
     const formData = new FormData()
+
     formData.append('file', file)
-    sendMessage(`[Uploaded: ${file.name}] Analyze this ${isPDF ? 'document' : 'image'}.`, mode)
+
+    sendMessage(
+      `[Uploaded: ${file.name}] Analyze this ${
+        isPDF ? 'document' : 'image'
+      }.`,
+      mode
+    )
+
     try {
-      const res = await axios.post(`${API}/api/ingest${endpoint}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: res.data.analysis,
-        sources: [], mode,
-        model: mode === 'fast' ? 'llama-3.1-8b-instant' : 'llama-3.3-70b-versatile',
-        report: null
-      }])
+      const res = await axios.post(
+        `${API}/api/ingest${endpoint}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: res.data.analysis,
+          sources: [],
+          mode,
+          model:
+            mode === 'fast'
+              ? 'llama-3.1-8b-instant'
+              : 'llama-3.3-70b-versatile',
+          report: null
+        }
+      ])
     } catch (e) {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `Analysis failed: ${e.response?.data?.detail || 'Please try again.'}`,
-        sources: [], mode, model: '', report: null
-      }])
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content:
+            e.response?.data?.detail ||
+            e.message ||
+            'Upload failed.',
+          sources: [],
+          mode,
+          model: '',
+          report: null
+        }
+      ])
     } finally {
       setUploading(false)
     }
   }
 
-  const handleCompanyInsight = () => {
-    if (!company || !year) return
-    sendMessage(`Give me a comprehensive financial analysis for ${company} for ${year}. Include stock performance, key financial metrics, market position, and investment outlook.`, 'deep')
-    setDrawerOpen(false)
-  }
-
-  useEffect(() => { inputRef.current?.focus() }, [])
-
   return (
     <motion.div
-  animate={{ backgroundColor: t.bg }}
-  transition={{ duration: 0.6 }}
-  className="h-screen flex flex-col relative overflow-hidden"
-  style={{
-    fontFamily: "'DM Sans', sans-serif",
-    backgroundColor: t.bg
-  }}
->
-      {/* Orbs */}
-      <motion.div key={mode + darkMode} initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 0.5, scale: 1 }} transition={{ duration: 0.8 }} style={{ backgroundColor: t.orb }} className="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl pointer-events-none z-0" />
-      <motion.div key={mode + 'b' + darkMode} initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ duration: 1 }} style={{ backgroundColor: t.orb }} className="absolute bottom-20 left-0 w-64 h-64 rounded-full blur-3xl pointer-events-none z-0" />
+      animate={{ backgroundColor: t.bg }}
+      transition={{ duration: 0.6 }}
+      className="h-screen flex flex-col relative overflow-hidden"
+      style={{
+        fontFamily: "'DM Sans', sans-serif",
+        backgroundColor: t.bg
+      }}
+    >
+      {/* BACKGROUND */}
+      <motion.div
+        key={mode + darkMode}
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 0.5, scale: 1 }}
+        transition={{ duration: 0.8 }}
+        style={{ backgroundColor: t.orb }}
+        className="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl pointer-events-none z-0"
+      />
 
-      {/* ===== TOP BAR ===== */}
-      <div style={{ backgroundColor: topBarBg, borderBottomColor: borderColor }} className="border-b z-10 flex-shrink-0">
-
-        {/* DESKTOP NAV */}
-        <div className="hidden md:flex items-center justify-between px-6 py-3 gap-4">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setDrawerOpen(!drawerOpen)} className="w-8 h-8 flex flex-col gap-1 items-center justify-center rounded-lg">
-              <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
-              <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
-              <span style={{ backgroundColor: textColor }} className="w-3 h-0.5 rounded block"></span>
-            </button>
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center"><span className="text-white font-bold text-xs">F</span></div>
-              <span style={{ color: textColor }} className="font-semibold">FinSight</span>
-            </div>
+      {/* TOP BAR */}
+      <div
+        style={{
+          backgroundColor: topBarBg,
+          borderBottomColor: borderColor
+        }}
+        className="border-b z-10 flex items-center justify-between px-6 py-3"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
+            <span className="text-white font-bold text-xs">
+              F
+            </span>
           </div>
 
-          <div style={{ backgroundColor: darkMode ? '#1e293b' : '#f1f5f9' }} className="flex items-center rounded-xl p-1 gap-1">
-            {Object.entries(themes).map(([key, th]) => (
-              <motion.button key={key} onClick={() => setMode(key)} whileTap={{ scale: 0.95 }}
-                style={{ backgroundColor: mode === key ? cardBg : 'transparent', color: mode === key ? textColor : subTextColor }}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap">
-                {th.label}
-              </motion.button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button onClick={() => setDarkMode(!darkMode)} style={{ borderColor, color: subTextColor }} className="text-xs border px-3 py-1.5 rounded-lg">
-              {darkMode ? '☀️ Light' : '🌙 Dark'}
-            </button>
-            <button onClick={clearMessages} style={{ borderColor, color: subTextColor }} className="text-xs border px-3 py-1.5 rounded-lg">
-              Clear chat
-            </button>
-          </div>
+          <span
+            style={{ color: textColor }}
+            className="font-semibold"
+          >
+            FinSight
+          </span>
         </div>
 
-        {/* MOBILE NAV */}
-        <div className="flex md:hidden flex-col px-3 py-2 gap-2">
-          {/* Row 1 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button onClick={() => setDrawerOpen(!drawerOpen)} className="w-8 h-8 flex flex-col gap-1 items-center justify-center">
-                <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
-                <span style={{ backgroundColor: textColor }} className="w-5 h-0.5 rounded block"></span>
-                <span style={{ backgroundColor: textColor }} className="w-3 h-0.5 rounded block"></span>
-              </button>
-              <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-lg bg-gray-900 flex items-center justify-center"><span className="text-white font-bold text-xs">F</span></div>
-                <span style={{ color: textColor }} className="font-semibold text-sm">FinSight</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <button onClick={() => setDarkMode(!darkMode)} style={{ borderColor, color: subTextColor }} className="text-xs border px-2 py-1 rounded-lg">
-                {darkMode ? '☀️' : '🌙'}
-              </button>
-              <button onClick={clearMessages} style={{ borderColor, color: subTextColor }} className="text-xs border px-2 py-1 rounded-lg">
-                Clear
-              </button>
-            </div>
-          </div>
-          {/* Row 2 - Mode switcher */}
-          <div className="flex justify-center">
-            <div style={{ backgroundColor: darkMode ? '#1e293b' : '#f1f5f9' }} className="flex items-center rounded-xl p-1 gap-1">
-              {Object.entries(themes).map(([key]) => (
-                <motion.button key={key} onClick={() => setMode(key)} whileTap={{ scale: 0.95 }}
-                  style={{ backgroundColor: mode === key ? cardBg : 'transparent', color: mode === key ? textColor : subTextColor }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-                  {key === 'fast' ? '⚡ Fast' : key === 'standard' ? '🧠 Standard' : '🔬 Deep'}
-                </motion.button>
-              ))}
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            style={{
+              borderColor,
+              color: subTextColor
+            }}
+            className="text-xs border px-3 py-1.5 rounded-lg"
+          >
+            {darkMode ? '☀️ Light' : '🌙 Dark'}
+          </button>
+
+          <button
+            onClick={clearMessages}
+            style={{
+              borderColor,
+              color: subTextColor
+            }}
+            className="text-xs border px-3 py-1.5 rounded-lg"
+          >
+            Clear chat
+          </button>
         </div>
       </div>
 
-      {/* ===== DRAWER ===== */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawerOpen(false)} className="fixed inset-0 bg-black/30 z-20 backdrop-blur-sm" />
-            <motion.aside initial={{ x: -320 }} animate={{ x: 0 }} exit={{ x: -320 }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              style={{ backgroundColor: cardBg, borderRightColor: borderColor }} className="fixed left-0 top-0 h-full w-72 shadow-2xl z-30 flex flex-col border-r">
-              <div style={{ borderBottomColor: borderColor }} className="flex items-center justify-between p-4 border-b">
-                <span style={{ color: textColor }} className="font-semibold text-sm">Menu</span>
-                <button onClick={() => setDrawerOpen(false)} style={{ color: subTextColor }} className="text-xl">×</button>
-              </div>
-
-              <div style={{ borderBottomColor: borderColor }} className="p-4 border-b">
-                <h3 style={{ color: textColor }} className="font-semibold text-sm mb-1">🏢 Company Insight</h3>
-                <p style={{ color: subTextColor }} className="text-xs mb-3">Full analysis without uploading PDF</p>
-                <input type="text" placeholder="Company (e.g. Apple)" value={company} onChange={e => setCompany(e.target.value)}
-                  style={{ backgroundColor: darkMode ? '#0f172a' : '#f9fafb', borderColor, color: textColor }}
-                  className="w-full border rounded-xl px-3 py-2 text-sm mb-2 focus:outline-none" />
-                <input type="text" placeholder="Year (e.g. 2023)" value={year} onChange={e => setYear(e.target.value)}
-                  style={{ backgroundColor: darkMode ? '#0f172a' : '#f9fafb', borderColor, color: textColor }}
-                  className="w-full border rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none" />
-                <button onClick={handleCompanyInsight} disabled={!company || !year}
-                  className="w-full bg-gray-900 text-white py-2 rounded-xl text-sm font-medium disabled:opacity-40">
-                  Analyze Company →
-                </button>
-              </div>
-
-              <div style={{ borderBottomColor: borderColor }} className="p-4 border-b">
-                <h3 style={{ color: textColor }} className="font-semibold text-sm mb-1">📄 Upload 10-K Filing</h3>
-                <p style={{ color: subTextColor }} className="text-xs mb-3">Enter company details above first</p>
-                <button onClick={() => fileRef.current.click()} disabled={uploading || !company || !year}
-                  style={{ borderColor, color: subTextColor }}
-                  className="w-full border-2 border-dashed rounded-xl py-3 text-sm disabled:opacity-40">
-                  {uploading ? 'Processing...' : '+ Click to upload PDF'}
-                </button>
-                {uploadedFiles.map((f, i) => (
-                  <div key={i} style={{ backgroundColor: darkMode ? '#0f172a' : '#f9fafb' }} className="mt-2 rounded-xl px-3 py-2">
-                    <p style={{ color: textColor }} className="text-xs font-medium">{f.company} {f.year}</p>
-                    <p style={{ color: subTextColor }} className="text-xs">{f.chunks} chunks indexed</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-4 flex-1 overflow-y-auto">
-                <h3 style={{ color: textColor }} className="font-semibold text-sm mb-3">Recent Chats</h3>
-                {messages.filter(m => m.role === 'user').slice(-5).reverse().map((m, i) => (
-                  <div key={i} style={{ borderBottomColor: borderColor }} className="py-2 border-b">
-                    <p style={{ color: subTextColor }} className="text-xs truncate">{m.content}</p>
-                  </div>
-                ))}
-                {messages.filter(m => m.role === 'user').length === 0 && (
-                  <p style={{ color: subTextColor }} className="text-xs">No recent chats</p>
-                )}
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* ===== CHAT AREA ===== */}
+      {/* CHAT AREA */}
       <div className="flex-1 overflow-y-auto z-10">
-        {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center px-4 text-center">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <h2 style={{ color: textColor }} className="text-2xl sm:text-3xl font-bold mb-2">Welcome! 👋</h2>
-              <p style={{ color: subTextColor }} className="mb-6 text-base sm:text-lg">How can I help you today?</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl w-full">
-                {quickPrompts.map((q, i) => (
-                  <motion.button key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 * i }} whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}
-                    onClick={() => handleSend(q)}
-                    style={{ backgroundColor: cardBg, borderColor, color: textColor }}
-                    className="border rounded-2xl px-4 py-3 text-sm text-left hover:shadow-sm transition-all">
-                    {q}
-                  </motion.button>
-                ))}
-              </div>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                style={{ backgroundColor: t.badge, color: t.badgeText }}
-                className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium">
-                {themes[mode].label} · {themes[mode].desc}
-              </motion.div>
-            </motion.div>
-          </div>
-        ) : (
-          <div className="max-w-3xl mx-auto px-4 py-6">
-            {messages.map((msg, i) => (
-              <MessageBubble key={i} message={msg} darkMode={darkMode} />
-            ))}
-            {loading && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start mb-4">
-                <div style={{ backgroundColor: cardBg, borderColor }} className="border rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-                  <div className="flex gap-1">
-                    {[0, 1, 2].map(i => (
-                      <motion.div key={i} animate={{ y: [0, -5, 0] }} transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.12 }}
-                        style={{ backgroundColor: t.button }} className="w-2 h-2 rounded-full" />
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </div>
-        )}
+        <div className="max-w-3xl mx-auto px-4 py-6">
+          {messages.map((msg, i) => (
+            <MessageBubble
+              key={i}
+              message={msg}
+              darkMode={darkMode}
+            />
+          ))}
+        </div>
       </div>
-      {previewOpen && selectedFile && (
-  <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div className="bg-white rounded-2xl p-4 w-full max-w-lg">
-      
-      <h2 className="text-lg font-semibold mb-3">
-        Preview File
-      </h2>
 
-      {selectedFile.type.startsWith('image/') ? (
-        <img
-          src={previewUrl}
-          alt="preview"
-          className="w-full rounded-xl max-h-[400px] object-contain"
-        />
-      ) : (
-        <iframe
-          src={URL.createObjectURL(selectedFile)}
-          title="PDF Preview"
-          className="w-full h-[400px] rounded-xl"
-        />
+      {/* PREVIEW MODAL */}
+      {previewOpen && selectedFile && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+
+          <div className="bg-white rounded-2xl p-4 w-full max-w-2xl shadow-2xl">
+
+            <h2 className="text-xl font-semibold mb-4 text-black">
+              Preview File
+            </h2>
+
+            {selectedFile.type.startsWith('image/') ? (
+              <img
+                src={previewUrl}
+                alt="preview"
+                className="w-full max-h-[500px] object-contain rounded-xl"
+              />
+            ) : (
+              <iframe
+                src={previewUrl}
+                title="PDF Preview"
+                className="w-full h-[500px] rounded-xl border"
+              />
+            )}
+
+            <div className="flex justify-end gap-3 mt-4">
+
+              <button
+                onClick={() => {
+                  setPreviewOpen(false)
+                  setSelectedFile(null)
+                  setPreviewUrl('')
+                }}
+                className="px-4 py-2 border rounded-xl text-black"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  handleFileUpload(selectedFile)
+
+                  setPreviewOpen(false)
+                  setSelectedFile(null)
+                  setPreviewUrl('')
+                }}
+                className="px-4 py-2 bg-black text-white rounded-xl"
+              >
+                Send
+              </button>
+
+            </div>
+          </div>
+        </div>
       )}
 
-      <div className="flex justify-end gap-2 mt-4">
-        
-        <button
-          onClick={() => {
-            setPreviewOpen(false)
-            setSelectedFile(null)
-          }}
-          className="px-4 py-2 rounded-xl border"
-        >
-          Cancel
-        </button>
-
-        <button
-          onClick={() => {
-            handleFileUpload(selectedFile)
-            setPreviewOpen(false)
-            setSelectedFile(null)
-          }}
-          className="px-4 py-2 rounded-xl bg-black text-white"
-        >
-          Send
-        </button>
-
-      </div>
-    </div>
-  </div>
-)}
-
-      {/* ===== INPUT BAR ===== */}
-      <div style={{ backgroundColor: topBarBg, borderTopColor: borderColor }} className="border-t z-10 p-3 sm:p-4 flex-shrink-0">
+      {/* INPUT BAR */}
+      <div
+        style={{
+          backgroundColor: topBarBg,
+          borderTopColor: borderColor
+        }}
+        className="border-t z-10 p-3 sm:p-4"
+      >
         <div className="max-w-3xl mx-auto">
-          <div style={{ backgroundColor: inputBg, borderColor }} className="flex items-end gap-2 border rounded-2xl px-3 py-2 shadow-sm">
 
-            {/* PDF button */}
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+          <div
+            style={{
+              backgroundColor: inputBg,
+              borderColor
+            }}
+            className="flex items-end gap-2 border rounded-2xl px-3 py-2 shadow-sm"
+          >
+            {/* PDF BUTTON */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => fileRef.current.click()}
-              style={{ color: uploading ? t.button : subTextColor }}
-              className="p-1 flex-shrink-0" title="Upload PDF">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+              disabled={uploading}
+              style={{
+                color: uploading
+                  ? t.button
+                  : subTextColor
+              }}
+              className="p-1 flex-shrink-0"
+            >
+              📄
             </motion.button>
-            <input ref={fileRef} type="file" accept=".pdf" className="hidden"
-              onChange={e => {
-   const file = e.target.files[0]
-   if (!file) return
 
-   setSelectedFile(file)
-   setPreviewOpen(true)
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".pdf"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files[0]
 
-   if (file.type.startsWith('image/')) {
-      setPreviewUrl(URL.createObjectURL(file))
-   } else {
-      setPreviewUrl('')
-   }
+                if (!file) return
 
-   e.target.value = ''
-}}
+                setSelectedFile(file)
+                setPreviewOpen(true)
 
-            {/* Image button */}
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                setPreviewUrl(
+                  URL.createObjectURL(file)
+                )
+
+                e.target.value = ''
+              }}
+            />
+
+            {/* IMAGE BUTTON */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => imageRef.current.click()}
-              style={{ color: subTextColor }}
-              className="p-1 flex-shrink-0" title="Upload Image">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+              disabled={uploading}
+              style={{
+                color: subTextColor
+              }}
+              className="p-1 flex-shrink-0"
+            >
+              🖼️
             </motion.button>
-            <input ref={imageRef} type="file" accept="image/*" className="hidden"
-              onChange={e => {
-   const file = e.target.files[0]
-   if (!file) return
 
-   setSelectedFile(file)
-   setPreviewOpen(true)
+            <input
+              ref={imageRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files[0]
 
-   if (file.type.startsWith('image/')) {
-      setPreviewUrl(URL.createObjectURL(file))
-   } else {
-      setPreviewUrl('')
-   }
+                if (!file) return
 
-   e.target.value = ''
-}}
+                setSelectedFile(file)
+                setPreviewOpen(true)
 
-            <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKey}
-              placeholder="Ask anything about finance, markets, investments..."
-              rows={1} style={{ color: textColor, caretColor: textColor }}
-              className="flex-1 bg-transparent text-sm placeholder-gray-400 focus:outline-none resize-none py-1" />
+                setPreviewUrl(
+                  URL.createObjectURL(file)
+                )
 
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-              onClick={() => handleSend()} disabled={loading || !input.trim()}
-              style={{ backgroundColor: t.button }}
-              className="text-white p-2 rounded-xl disabled:opacity-40 flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-              </svg>
+                e.target.value = ''
+              }}
+            />
+
+            {/* TEXTAREA */}
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) =>
+                setInput(e.target.value)
+              }
+              onKeyDown={handleKey}
+              onInput={(e) => {
+                e.target.style.height = 'auto'
+                e.target.style.height = `${e.target.scrollHeight}px`
+              }}
+              placeholder="Ask anything..."
+              rows={1}
+              style={{
+                color: textColor,
+                caretColor: textColor
+              }}
+              className="flex-1 bg-transparent text-sm placeholder-gray-400 focus:outline-none resize-none py-1"
+            />
+
+            {/* SEND BUTTON */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleSend()}
+              disabled={loading || !input.trim()}
+              style={{
+                backgroundColor: t.button
+              }}
+              className="text-white p-2 rounded-xl disabled:opacity-40 flex-shrink-0"
+            >
+              ➤
             </motion.button>
           </div>
-          <p style={{ color: subTextColor }} className="text-center text-xs mt-2">Enter to send · Shift+Enter for new line</p>
+
+          <p
+            style={{ color: subTextColor }}
+            className="text-center text-xs mt-2"
+          >
+            Enter to send · Shift+Enter for new line
+          </p>
         </div>
       </div>
     </motion.div>
