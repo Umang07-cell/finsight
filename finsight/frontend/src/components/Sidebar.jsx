@@ -78,7 +78,49 @@ export default function Sidebar({
       </div>
 
       {/* ===== COMPANY INSIGHT + UPLOAD ===== */}
-      <UploadPanel />
+      {/* ===== COMPANY INSIGHT ===== */}
+<div className="p-4 border-b border-border">
+  <h3 className="text-white font-semibold text-sm mb-1">
+    🏢 Company Insight
+  </h3>
+
+  <p className="text-slate-500 text-xs mb-4">
+    Full analysis without uploading PDF
+  </p>
+
+  <div className="space-y-3">
+    <input
+      type="text"
+      placeholder="Company (e.g. Apple)"
+      className="w-full bg-dark border border-border rounded-xl px-4 py-3 text-sm text-white outline-none"
+    />
+
+    <input
+      type="text"
+      placeholder="Year (e.g. 2023)"
+      className="w-full bg-dark border border-border rounded-xl px-4 py-3 text-sm text-white outline-none"
+    />
+
+    <button
+      className="w-full bg-primary text-white rounded-xl py-3 text-sm font-medium hover:opacity-90 transition"
+    >
+      Analyze Company →
+    </button>
+  </div>
+</div>
+
+{/* ===== CHATGPT MENU ===== */}
+<div className="p-3 border-b border-border space-y-2">
+
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/20 text-primary">
+    ✏️ New Chat
+  </button>
+
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-dark hover:text-white">
+    🔍 Search Chats
+  </button>
+
+</div>
 
       {/* ===== MODE SELECTOR ===== */}
       <div className="p-4 border-b border-border">
