@@ -45,10 +45,21 @@ export default function Chat() {
   const [uploading, setUploading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [activeChatId, setActiveChatId] = useState(null)
-  const { messages, setMessages, loading, sendMessage, clearMessages, startNewChat, loadChat, savedChats, sessionId } = useChat()
-  const inputRef = useRef()
+  const {
+  messages,
+  setMessages,
+  loading,
+  sendMessage,
+  clearMessages,
+  startNewChat,
+  loadChat,
+  savedChats,
+  deleteChat,
+  sessionId
+} = useChat()
   const fileRef = useRef()
-  const imageRef = useRef()
+const imageRef = useRef()
+const inputRef = useRef()
 
   const t = themes[mode][darkMode ? 'dark' : 'light']
   const textColor = darkMode ? '#f1f5f9' : '#111827'
@@ -284,6 +295,7 @@ useEffect(() => {
   setYear={setYear}
 
   onCompanyInsight={handleCompanyInsight}
+  deleteChat={deleteChat}
 />
       </motion.div>
     </>
