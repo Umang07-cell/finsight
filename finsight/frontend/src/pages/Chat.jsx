@@ -44,6 +44,7 @@ export default function Chat() {
   const [previewOpen, setPreviewOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState([])
+  const [activeChatId, setActiveChatId] = useState(null)
   const { messages, setMessages, loading, sendMessage, clearMessages, startNewChat, loadChat, savedChats, sessionId } = useChat()
   const inputRef = useRef()
   const fileRef = useRef()
@@ -107,7 +108,38 @@ export default function Chat() {
     setDrawerOpen(false)
   }
 
-  useEffect(() => { inputRef.current?.focus() }, [])
+  useEffect(() => {
+  inputRef.current?.focus()
+}, [])
+
+useEffect(() => {
+  localStorage.setItem(
+    'finsight_saved_chats',
+    JSON.stringify(savedChats)
+  )
+}, [savedChats])
+
+useEffect(() => {
+  const stored = localStorage.getItem(
+    'finsight_saved_chats'
+  )
+
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored)
+
+      if (parsed?.length) {
+        parsed.forEach(chat => {
+          if (!savedChats.find(c => c.id === chat.id)) {
+            savedChats.push(chat)
+          }
+        })
+      }
+    } catch (e) {
+      console.log('Failed to load chats')
+    }
+  }
+}, [])
 
   return (
     <motion.div
@@ -224,15 +256,33 @@ export default function Chat() {
       >
        <Sidebar
   onClear={clearMessages}
-  recentChats={savedChats.map(c => ({ id: c.id, title: c.title }))}
-  activeChat={null}
-  setActiveChat={(id) => { loadChat(id); setDrawerOpen(false) }}
-  onNewChat={() => { startNewChat(); setDrawerOpen(false) }}
+  recentChats={savedChats.map(c => ({
+    id: c.id,
+    title: c.title
+  }))}
+
+  activeChat={activeChatId}
+
+  setActiveChat={(id) => {
+    setActiveChatId(id)
+    loadChat(id)
+    setDrawerOpen(false)
+  }}
+
+  onNewChat={() => {
+    setActiveChatId(null)
+    startNewChat()
+    setDrawerOpen(false)
+  }}
+
   darkMode={darkMode}
+
   company={company}
   setCompany={setCompany}
+
   year={year}
   setYear={setYear}
+
   onCompanyInsight={handleCompanyInsight}
 />
       </motion.div>
