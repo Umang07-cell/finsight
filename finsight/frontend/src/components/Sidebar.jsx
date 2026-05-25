@@ -14,6 +14,7 @@ export default function Sidebar({
   year,
   setYear,
   onCompanyInsight,
+deleteChat,
 }) {
   const bg = darkMode ? '#1e293b' : '#ffffff'
   const textColor = darkMode ? '#f1f5f9' : '#111827'
@@ -169,9 +170,13 @@ export default function Sidebar({
                     </div>
 
                     <button
-                      onClick={e => {
-                        e.stopPropagation()
-                      }}
+                    onClick={e => {
+                    e.stopPropagation()
+
+                    if (deleteChat) {
+                    deleteChat(chat.id)
+                  }
+        }}
                       className="opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <Trash2
