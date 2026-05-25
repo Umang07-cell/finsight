@@ -189,6 +189,24 @@ export default function useChat() {
       setMessages(chat.messages)
     }
   }
+  const deleteChat = (chatId) => {
+
+  const updated = savedChats.filter(
+    c => c.id !== chatId
+  )
+
+  setSavedChats(updated)
+
+  localStorage.setItem(
+    'finsight_saved_chats',
+    JSON.stringify(updated)
+  )
+
+  // if current open chat deleted
+  if (sessionId === chatId) {
+    setMessages([])
+  }
+}
 
   // ===== CLEAR CURRENT CHAT =====
   const clearMessages = () => {
@@ -196,6 +214,7 @@ export default function useChat() {
   }
 
   return {
+    deleteChat,
     messages,
     setMessages,
     loading,
