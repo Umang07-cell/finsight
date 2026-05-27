@@ -50,9 +50,9 @@ export default function Home() {
           transition={{ duration: 0.6 }}
         >
           <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-1.5 text-sm text-gray-600 mb-8">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            Live market data · SEC filings · AI analysis
-          </div>
+  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+  RAG Architecture · Llama 3 · Real-time Analysis
+</div>
  
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6 tracking-tight">
             Your Personal<br />
