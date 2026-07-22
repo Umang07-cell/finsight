@@ -15,7 +15,7 @@ class Settings:
     DEEP_TOP_K: int = 20
     CHUNK_SIZE: int = 500
     CHUNK_OVERLAP: int = 50
-    CHROMA_PATH: str = os.getenv("CHROMA_PATH", "./chroma_db")
+    CHROMA_PATH: str = os.getenv("CHROMA_PATH", "/var/data/chroma_db")
 
 @lru_cache()
 def get_settings():
