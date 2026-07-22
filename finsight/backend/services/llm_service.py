@@ -3,7 +3,14 @@ from config import get_settings
 import json
 
 settings = get_settings()
-client = Groq(api_key=settings.GROQ_API_KEY)
+
+_client = None
+
+def get_client():
+    global _client
+    if _client is None:
+        _client = Groq(api_key=settings.GROQ_API_KEY)
+    return _client
 
 def get_model(mode: str) -> str:
     return {
@@ -101,7 +108,7 @@ def query_llm(question: str, chunks: list, mode: str, history: list = []) -> dic
 
     # FAST MODE
     if mode == "fast":
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model=model,
             messages=[
                 {
@@ -127,7 +134,7 @@ def query_llm(question: str, chunks: list, mode: str, history: list = []) -> dic
 
     # STANDARD MODE
     if mode == "standard":
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model=model,
             messages=[
                 {
@@ -177,7 +184,7 @@ Never say 'I cannot' or 'As an AI' — just answer helpfully and directly.
 
         if is_analysis_request:
             try:
-                response = client.chat.completions.create(
+                response = get_client().chat.completions.create(
                     model=model,
                     messages=[
                         {
@@ -237,7 +244,7 @@ CRITICAL RULES:
                     "report": None
                 }
         else:
-            response = client.chat.completions.create(
+            response = get_client().chat.completions.create(
                 model=model,
                 messages=[
                     {
