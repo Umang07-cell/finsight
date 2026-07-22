@@ -8,7 +8,14 @@ from groq import Groq
 from config import get_settings
 
 settings = get_settings()
-client = Groq(api_key=settings.GROQ_API_KEY)
+
+_client = None
+
+def get_client():
+    global _client
+    if _client is None:
+        _client = Groq(api_key=settings.GROQ_API_KEY)
+    return _client
 
 router = APIRouter()
 
@@ -57,7 +64,7 @@ async def analyze_pdf(file: UploadFile = File(...)):
         if not text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from PDF")
 
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model=settings.STANDARD_MODEL,
             messages=[
                 {
@@ -84,7 +91,7 @@ async def analyze_image(file: UploadFile = File(...)):
         ext = file.filename.split('.')[-1].lower()
         media_type = f"image/{ext}" if ext != 'jpg' else "image/jpeg"
 
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model="llama-4-scout-17b-16e-instruct",
             messages=[
                 {
