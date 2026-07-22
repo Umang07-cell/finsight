@@ -5,7 +5,6 @@ from functools import lru_cache
 load_dotenv()
 
 class Settings:
-    ALPHA_VANTAGE_KEY: str = os.getenv("ALPHA_VANTAGE_KEY", "")
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./finsight.db")
     FAST_MODEL: str = "llama-3.1-8b-instant"
@@ -16,7 +15,7 @@ class Settings:
     DEEP_TOP_K: int = 20
     CHUNK_SIZE: int = 500
     CHUNK_OVERLAP: int = 50
-    CHROMA_PATH: str = "./chroma_db"
+    CHROMA_PATH: str = os.getenv("CHROMA_PATH", "./chroma_db")
 
 @lru_cache()
 def get_settings():
