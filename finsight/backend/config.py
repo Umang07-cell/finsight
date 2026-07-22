@@ -4,9 +4,14 @@ from functools import lru_cache
 
 load_dotenv()
 
+def _fix_sslmode(url: str) -> str:
+    if "sslmode=required" in url:
+        return url.replace("sslmode=required", "sslmode=require")
+    return url
+
 class Settings:
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./finsight.db")
+    DATABASE_URL: str = _fix_sslmode(os.getenv("DATABASE_URL", "sqlite:///./finsight.db"))
     FAST_MODEL: str = "llama-3.1-8b-instant"
     STANDARD_MODEL: str = "llama-3.3-70b-versatile"
     DEEP_MODEL: str = "llama-3.3-70b-versatile"
