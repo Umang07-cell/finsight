@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 export default function useChat() {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -116,7 +118,7 @@ export default function useChat() {
     try {
 
       const res = await axios.post(
-        'https://finsight-production-b9e2.up.railway.app/api/query/',
+        `${API_URL}/api/query/`,
         {
           question,
           session_id: sessionId,
