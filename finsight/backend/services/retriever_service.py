@@ -4,11 +4,20 @@ from config import get_settings
 
 settings = get_settings()
 
-embeddings = HuggingFaceEmbeddings(
-    model_name="all-MiniLM-L6-v2"
-)
+_embeddings = None
+_chroma_client = None
 
-chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PATH)
+def get_embeddings():
+    global _embeddings
+    if _embeddings is None:
+        _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    return _embeddings
+
+def get_chroma_client():
+    global _chroma_client
+    if _chroma_client is None:
+        _chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PATH)
+    return _chroma_client
 
 def retrieve_chunks(question: str, mode: str, company: str = None, year: str = None):
     top_k = {
@@ -17,9 +26,9 @@ def retrieve_chunks(question: str, mode: str, company: str = None, year: str = N
         "deep": settings.DEEP_TOP_K
     }.get(mode, settings.STANDARD_TOP_K)
 
-    collection = chroma_client.get_collection("sec_filings")
+    collection = get_chroma_client().get_collection("sec_filings")
 
-    query_embedding = embeddings.embed_query(question)
+    query_embedding = get_embeddings().embed_query(question)
 
     where_filter = {}
     if company and year:
