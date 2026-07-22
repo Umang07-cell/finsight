@@ -1,5 +1,3 @@
-from langchain_huggingface import HuggingFaceEmbeddings
-import chromadb
 from config import get_settings
 
 settings = get_settings()
@@ -10,12 +8,14 @@ _chroma_client = None
 def get_embeddings():
     global _embeddings
     if _embeddings is None:
+        from langchain_huggingface import HuggingFaceEmbeddings
         _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     return _embeddings
 
 def get_chroma_client():
     global _chroma_client
     if _chroma_client is None:
+        import chromadb
         _chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PATH)
     return _chroma_client
 
