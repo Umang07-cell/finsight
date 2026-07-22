@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 export default function useUpload() {
   const [uploading, setUploading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState([])
@@ -17,7 +19,7 @@ export default function useUpload() {
 
     try {
       const res = await axios.post(
-        'https://finsight-production-b9e2.up.railway.app/api/ingest/',
+        `${API_URL}/api/ingest/`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       )
