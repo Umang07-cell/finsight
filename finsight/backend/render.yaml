@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: finsight-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: finsight-db
+          property: connectionString
+      - key: ALPHA_VANTAGE_KEY
+        sync: false
+      - key: CHROMA_PATH
+        value: /opt/render/project/src/chroma_db
+    healthCheckPath: /health
+    disk:
+      name: chroma-disk
+      mountPath: /opt/render/project/src/chroma_db
+      sizeGB: 1
+
+databases:
+  - name: finsight-db
+    databaseName: finsight
+    user: finsight_user
+    plan: free

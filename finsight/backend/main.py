@@ -14,6 +14,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "https://protective-warmth-production-a213.up.railway.app",
+        "https://finsight-frontend.onrender.com",
         "*"
     ],
     allow_credentials=True,
@@ -25,10 +26,15 @@ app.add_middleware(
 async def startup():
     init_db()
 
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "finsight-api"}
+
 app.include_router(ingest.router, prefix="/api/ingest", tags=["Ingest"])
 app.include_router(query.router, prefix="/api/query", tags=["Query"])
 app.include_router(history.router, prefix="/api/history", tags=["History"])
 app.include_router(market.router, prefix="/api/market", tags=["Market"])
+
 @app.get("/")
 async def root():
     return {"message": "FinSight API is running"}
