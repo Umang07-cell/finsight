@@ -7,11 +7,20 @@ from config import get_settings
 
 settings = get_settings()
 
-embeddings = HuggingFaceEmbeddings(
-    model_name="all-MiniLM-L6-v2"
-)
+_embeddings = None
+_chroma_client = None
 
-chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PATH)
+def get_embeddings():
+    global _embeddings
+    if _embeddings is None:
+        _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    return _embeddings
+
+def get_chroma_client():
+    global _chroma_client
+    if _chroma_client is None:
+        _chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PATH)
+    return _chroma_client
 
 def ingest_pdf(file_path: str, company_name: str, year: str) -> int:
     loader = PyPDFLoader(file_path)
@@ -25,9 +34,9 @@ def ingest_pdf(file_path: str, company_name: str, year: str) -> int:
 
     collection_name = "sec_filings"
     try:
-        collection = chroma_client.get_collection(collection_name)
+        collection = get_chroma_client().get_collection(collection_name)
     except:
-        collection = chroma_client.create_collection(collection_name)
+        collection = get_chroma_client().create_collection(collection_name)
 
     texts = [chunk.page_content for chunk in chunks]
     metadatas = [
@@ -40,7 +49,7 @@ def ingest_pdf(file_path: str, company_name: str, year: str) -> int:
     ]
     ids = [f"{company_name}_{year}_{i}" for i in range(len(chunks))]
 
-    embedded = embeddings.embed_documents(texts)
+    embedded = get_embeddings().embed_documents(texts)
 
     collection.add(
         embeddings=embedded,
