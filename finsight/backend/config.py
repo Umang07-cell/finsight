@@ -13,8 +13,8 @@ class Settings:
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     DATABASE_URL: str = _fix_sslmode(os.getenv("DATABASE_URL", "sqlite:///./finsight.db"))
     FAST_MODEL: str = "llama-3.1-8b-instant"
-    STANDARD_MODEL: str = "llama-3.3-70b-versatile"
-    DEEP_MODEL: str = "llama-3.3-70b-versatile"
+    STANDARD_MODEL: str = "openai/gpt-oss-20b"
+    DEEP_MODEL: str = "openai/gpt-oss-20b"
     FAST_TOP_K: int = 5
     STANDARD_TOP_K: int = 10
     DEEP_TOP_K: int = 20
