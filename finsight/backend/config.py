@@ -14,7 +14,7 @@ class Settings:
     DATABASE_URL: str = _fix_sslmode(os.getenv("DATABASE_URL", "sqlite:///./finsight.db"))
     FAST_MODEL: str = "llama-3.1-8b-instant"
     STANDARD_MODEL: str = "openai/gpt-oss-20b"
-    DEEP_MODEL: str = "openai/gpt-oss-20b"
+    DEEP_MODEL: str = "openai/gpt-oss-120b"
     FAST_TOP_K: int = 5
     STANDARD_TOP_K: int = 10
     DEEP_TOP_K: int = 20
