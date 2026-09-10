@@ -223,7 +223,7 @@ deleteChat,
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm hover:opacity-80 transition-all"
           >
             <User size={16} />
-            <span>Profile</span>
+            <span>Engineered by</span>
           </button>
 
         </div>
